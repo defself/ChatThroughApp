@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  root "users#welcome"
+  resources :users
+  resource :oauth, only: [:show]
+
+  root "home#welcome"
 end
