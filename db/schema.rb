@@ -13,10 +13,11 @@
 ActiveRecord::Schema.define(version: 20160925111726) do
 
   create_table "chat_rooms", force: :cascade do |t|
-    t.string   "title"
+    t.string   "name"
     t.integer  "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer  "receiver_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
     t.index ["user_id"], name: "index_chat_rooms_on_user_id"
   end
 
@@ -34,6 +35,8 @@ ActiveRecord::Schema.define(version: 20160925111726) do
     t.string   "email",                  default: "", null: false
     t.string   "first_name",             default: "", null: false
     t.string   "last_name",              default: "", null: false
+    t.string   "bot_user_id"
+    t.string   "bot_access_token"
     t.string   "encrypted_password",     default: "", null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
