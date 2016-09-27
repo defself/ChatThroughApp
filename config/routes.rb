@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  resources :users
-  resource :oauth, only: [:show]
+  resources :users,      only: [:index]
+  resources :chat_rooms, only: [:create]
+  resource  :oauth,      only: [:show, :create]
 
-  root "home#welcome"
+  root "users#index"
 end

@@ -1,9 +1,11 @@
 class OauthsController < ApplicationController
-  before_action :without_token
+  before_action :slack_authorized!
 
   def show
     if code = params[:code]
-      Oauth.save_access_token(code, current_user)
+      o = Oauth.create!(user: current_user)
+      o.save_access_token!(code)
+
       redirect_to users_path
     else
       render "home/welcome"
@@ -12,7 +14,11 @@ class OauthsController < ApplicationController
 
   protected
 
-  def without_token
-    redirect_to users_path if current_user.bot_access_token
+  def slack_authorized!
+    if current_user&.slack_authorized?
+      current_user.oauth.open_websocket!
+
+      redirect_to root_path
+    end
   end
 end

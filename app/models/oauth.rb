@@ -1,5 +1,3 @@
-require "http"
-require "json"
 require "faye/websocket"
 require "eventmachine"
 
@@ -8,26 +6,39 @@ Thread.new do
   end
 end
 
-class Oauth
-  def self.get_access_token(code, current_user)
-    rc = HTTP.post("https://slack.com/api/oauth.access", params: {
+class Oauth < ApplicationRecord
+  belongs_to :user
+
+  include Slack::API
+
+  def save_access_token!(code)
+    return unless code
+
+    get_access_token!(code)
+    open_websocket!
+  end
+
+  def get_access_token!(code)
+    rc = slack_api("oauth.access", {
       client_id:     ENV['CLIENT_ID'],
       client_secret: ENV['CLIENT_SECRET'],
       code:          code
     })
-    rc = JSON.parse(rc.body)
-    current_user.update_attributes(bot_user_id:      rc["bot"]["bot_user_id"],
-                                   bot_access_token: rc["bot"]["bot_access_token"])
-    current_user.bot_access_token
+
+    update_attributes(
+      access_token:     rc["access_token"],
+      team_id:          rc["team_id"],
+      team_name:        rc["team_name"],
+      bot_user_id:      rc["bot"]["bot_user_id"],
+      bot_access_token: rc["bot"]["bot_access_token"]
+    )
   end
 
-  def self.open_websocket(token)
-    rc = JSON.parse(HTTP.post('https://slack.com/api/rtm.start', params: {
-      token: token
-    }))
-    url = rc["url"]
+  def open_websocket!
+    url = slack_api("rtm.start", {
+      token: bot_access_token
+    })["url"]
 
-    # Open a websocket
     ws = Faye::WebSocket::Client.new(url)
 
     ws.on :open do
@@ -48,12 +59,5 @@ class Oauth
       ws = nil
       EM.stop
     end
-  end
-
-  def self.save_access_token(code, current_user)
-    return unless code
-
-    token = get_access_token(code, current_user)
-    open_websocket(token)
   end
 end

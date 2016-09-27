@@ -4,6 +4,8 @@ class CreateChatRooms < ActiveRecord::Migration[5.0]
       t.string :name
       t.references :user, foreign_key: true
       t.integer :receiver_id
+      t.string :channel_id
+      t.string :team_id
 
       t.timestamps
     end
