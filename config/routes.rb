@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   resources :users,      only: [:index]
   resources :chat_rooms, only: [:create]
-  resource  :oauth,      only: [:show, :create]
+  get :oauth, to: "oauths#authorize"
 
   root "users#index"
 end
