@@ -1,26 +1,30 @@
 class ChatRoom < ApplicationRecord
   belongs_to :user
   has_many :messages, dependent: :destroy
+  has_one :bot
 
   def slack_channel(app: false)
-    unless id # create a chat_room if it doesn't exist
-      chat = new_channel!
+    # create a new channel if the chat_room doesn't exist
+    unless id
+      chat = new_channel
       update_attributes(
         channel_id: chat["channel"]["id"],
         name:       chat["channel"]["name"],
         team_id:    user.oauth.team_id
       )
-      invite_bot!
     end
+
+    create_bot.invite_to_channel unless bot
+    bot.wake_up                  unless bot.alive
 
     slack_url(app)
   end
 
   private
 
-  def new_channel!
+  def new_channel
     receiver = User.find_by_id(receiver_id)
-    name     = receiver.channel_title # "chat_with_<receiver_user_name>"
+    name     = receiver.channel_title # "chat_with_<receiver>"
 
     slack_api("channels.create", {
       name:  name,
@@ -28,19 +32,8 @@ class ChatRoom < ApplicationRecord
     })
   end
 
-  def invite_bot!
-    slack_api("channels.invite", {
-      token:   user.oauth.access_token,
-      channel: channel_id,
-      user:    user.oauth.bot_user_id
-    })
-  end
-
   def slack_url(app)
-    if app # deep link
-      "slack://channel?id=#{channel_id}&team=#{user.oauth.team_id}"
-    else   # web link
-      "https://#{user.oauth.team_name}.slack.com/messages/#{name}"
-    end
+    app ? "slack://channel?id=#{channel_id}&team=#{user.oauth.team_id}" # deep link
+        : "https://#{user.oauth.team_name}.slack.com/messages/#{name}"  # web link
   end
 end

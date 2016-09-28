@@ -12,12 +12,14 @@
     <ul>
       <% if user_signed_in? %>
         <li>
-        <%= link_to('Logout', destroy_user_session_path, method: :delete) %>
-        <%= link_to(current_user.name, user_path(current_user)) %>
+          <%= link_to("Logout", destroy_user_session_path, method: :delete) %>
+        </li>
+        <li>
+          <%= "Hi @#{current_user.user_name}!" %>
         </li>
       <% else %>
         <li>
-        <%= link_to('Login', new_user_session_path) %>
+        <%= link_to("Login", new_user_session_path) %>
         </li>
       <% end %>
     </ul>
@@ -26,5 +28,16 @@
     <%- end %>
 
     <%= yield %>
+
+    <% if Rails.env.development? %>
+      <ul>
+        <li>
+          <%= link_to("Wake up bots", wake_up_bots_path, method: :post) %>
+        </li>
+        <li>
+          <%= link_to("Kill bots", kill_bots_path, method: :delete) %>
+        </li>
+      </ul>
+    <% end %>
   </body>
 </html>
