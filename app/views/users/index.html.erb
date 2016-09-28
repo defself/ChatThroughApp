@@ -1,7 +1,7 @@
 <%- @users.each do |user| %>
   <ul class="chat-with">
     <li><%= "#{user.name} (#{user.user_name})" %></li>
-    <li><%= link_to "web", chat_rooms_path({ user_id: user.id, app: false }), method: :post %></li>
+    <li><%= link_to "web", chat_rooms_path({ user_id: user.id, app: false }), method: :post, target: "_blank" %></li>
     <li><%= link_to "app", chat_rooms_path({ user_id: user.id, app: true }), method: :post %></li>
   </ul>
 <%- end %>
