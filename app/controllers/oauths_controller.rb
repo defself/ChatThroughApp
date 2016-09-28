@@ -1,7 +1,8 @@
 class OauthsController < ApplicationController
   def authorize
-    if code = params[:code]
-      o = Oauth.create!(user: current_user)
+    if params[:state] == "authorized" &&
+       code = params["code"]
+      o = current_user.oauth || Oauth.create!(user: current_user)
       o.save_access_token!(code)
     elsif current_user&.slack_authorized?
       current_user.oauth.open_websocket!

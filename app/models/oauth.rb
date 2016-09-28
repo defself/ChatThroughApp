@@ -22,6 +22,7 @@ class Oauth < ApplicationRecord
     rc = slack_api("oauth.access", {
       client_id:     ENV['CLIENT_ID'],
       client_secret: ENV['CLIENT_SECRET'],
+      redirect_uri:  ENV['REDIRECT_URI'],
       code:          code
     })
 
