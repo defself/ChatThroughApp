@@ -24,7 +24,8 @@ class Oauth < ApplicationRecord
       team_id:          data["team_id"],
       team_name:        data["team_name"],
       bot_user_id:      data["bot"]["bot_user_id"],
-      bot_access_token: data["bot"]["bot_access_token"]
+      bot_access_token: data["bot"]["bot_access_token"],
+      slack_user_id:    data["user_id"]
     )
   end
 end

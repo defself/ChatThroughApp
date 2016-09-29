@@ -6,6 +6,7 @@ class CreateOauths < ActiveRecord::Migration[5.0]
       t.string :bot_access_token
       t.string :team_id
       t.string :team_name
+      t.string :slack_user_id
       t.references :user, index: true, unique: true, foreign_key: true
 
       t.timestamps

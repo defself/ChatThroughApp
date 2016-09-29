@@ -11,6 +11,9 @@
   <body>
     <ul>
       <% if user_signed_in? %>
+        <li style = "display: none;">
+          <%= link_to("Restart bots", bots_path, method: :post) %>
+        </li>
         <li>
           <%= link_to("Logout", destroy_user_session_path, method: :delete) %>
         </li>
@@ -29,15 +32,5 @@
 
     <%= yield %>
 
-    <% if Rails.env.development? %>
-      <ul>
-        <li>
-          <%= link_to("Wake up bots", wake_up_bots_path, method: :post) %>
-        </li>
-        <li>
-          <%= link_to("Kill bots", kill_bots_path, method: :delete) %>
-        </li>
-      </ul>
-    <% end %>
   </body>
 </html>

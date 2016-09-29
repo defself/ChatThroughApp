@@ -28,7 +28,6 @@ ActiveRecord::Schema.define(version: 20160928072026) do
     t.integer  "user_id"
     t.integer  "receiver_id"
     t.string   "channel_id"
-    t.string   "team_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.index ["user_id"], name: "index_chat_rooms_on_user_id", using: :btree
@@ -51,6 +50,7 @@ ActiveRecord::Schema.define(version: 20160928072026) do
     t.string   "bot_access_token"
     t.string   "team_id"
     t.string   "team_name"
+    t.string   "slack_user_id"
     t.integer  "user_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false

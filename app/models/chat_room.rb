@@ -1,5 +1,6 @@
 class ChatRoom < ApplicationRecord
   belongs_to :user
+  belongs_to :receiver, class_name: :User, foreign_key: :receiver_id
   has_many :messages, dependent: :destroy
   has_one :bot
 
@@ -9,8 +10,7 @@ class ChatRoom < ApplicationRecord
       chat = new_channel
       update_attributes(
         channel_id: chat["channel"]["id"],
-        name:       chat["channel"]["name"],
-        team_id:    user.oauth.team_id
+        name:       chat["channel"]["name"]
       )
     end
 
@@ -18,6 +18,10 @@ class ChatRoom < ApplicationRecord
     bot.wake_up                  unless bot.alive
 
     slack_url(app)
+  end
+
+  def opposite
+    receiver.chat_rooms.find_by(receiver_id: user_id)
   end
 
   private

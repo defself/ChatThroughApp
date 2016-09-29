@@ -8,6 +8,10 @@ class User < ApplicationRecord
   has_many :messages, dependent: :destroy
   has_one :oauth
 
+  delegate :bot_access_token, to: :oauth
+
+  validates :user_name, uniqueness: true
+
   def name
     "#{first_name} #{last_name}"
   end

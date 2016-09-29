@@ -1,15 +1,8 @@
 class BotsController < ApplicationController
   def create
-    current_user.chat_rooms.each do |chat|
-      chat.bot.wake_up unless chat.bot.alive
-    end
-
-    redirect_back(fallback_location: root_path)
-  end
-
-  def destroy
-    current_user.chat_rooms.each do |chat|
-      chat.bot.kill if chat.bot.alive
+    Bot.all.each do |bot|
+      bot.kill    if     bot.alive
+      bot.wake_up unless bot.alive
     end
 
     redirect_back(fallback_location: root_path)

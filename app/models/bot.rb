@@ -28,11 +28,11 @@ class Bot < ApplicationRecord
     end
 
     @ws.on :message do |event|
-      listen_chat(event)
+      listen_channel(event)
     end
 
     @ws.on :close do |event|
-      go_to_sleep(event)
+      close_websocket(event)
     end
 
     self
@@ -45,6 +45,14 @@ class Bot < ApplicationRecord
     self
   end
 
+  def forward_message(msg, from = nil)
+    chat_room.messages.create(
+      body:     msg,
+      user:     chat_room.user,
+      receiver: chat_room.receiver
+    ).forward(from)
+  end
+
   private
 
   def open_websocket
@@ -52,19 +60,32 @@ class Bot < ApplicationRecord
     update_attributes(alive: true)
   end
 
-  def listen_chat(event)
+  def listen_channel(event)
     data = JSON.parse(event.data) if event && event.data
-    p [:message, data]
 
-    if data && data['type'] == 'message' && data['text'] == 'hi'
-      @ws.send({ type: 'message', text: "hi <@#{data['user']}>", channel: data['channel'] }.to_json)
-    elsif data && data['type'] == 'message' && data['text'].include?('fuck')
-      @ws.send({ type: 'message', text: "I'm going home!", channel: data['channel'] }.to_json)
+    return unless
+      data["channel"] == chat_room.channel_id &&
+      data["type"]    == "message" &&
+      data["user"]    == chat_room.user.oauth.slack_user_id &&
+      !data["text"].include?("@#{chat_room.opposite.user.oauth.slack_user_id}")
+
+    bot_id = chat_room.user.oauth.bot_user_id
+
+    case msg = data["text"]
+    when /<@#{bot_id}>/
+      @ws.send({ type: "message", text: "hi <@#{data['user']}>", channel: data["channel"] }.to_json)
+    when /fuck/
+      @ws.send({ type: "message", text: "I'm going home!", channel: data["channel"] }.to_json)
       kill(code: 666, reason: "bad word")
+    else
+      chat_room.opposite ? forward_message(msg, data["user"])
+                         : @ws.send({ type:    "message",
+                                      text:    "Wait a minute! Your partner did not accept invitation yet. Please, try again later.",
+                                      channel: data["channel"] }.to_json)
     end
   end
 
-  def go_to_sleep(event)
+  def close_websocket(event)
     p [:close, event.code, event.reason]
     @ws = nil
     EM.stop
