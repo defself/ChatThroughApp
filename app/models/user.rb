@@ -8,8 +8,6 @@ class User < ApplicationRecord
   has_many :messages, dependent: :destroy
   has_one :oauth
 
-  delegate :bot_access_token, to: :oauth
-
   validates :user_name, uniqueness: true
 
   def name
@@ -22,5 +20,9 @@ class User < ApplicationRecord
 
   def slack_authorized?
     oauth&.access_token && oauth.bot_access_token
+  end
+
+  def bots_alive?
+    !chat_rooms.map { |c| c.bot.alive? }.include?(false)
   end
 end

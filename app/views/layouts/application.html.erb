@@ -11,9 +11,11 @@
   <body>
     <ul>
       <% if user_signed_in? %>
-        <li style = "display: none;">
-          <%= link_to("Restart bots", bots_path, method: :post) %>
-        </li>
+        <% if current_user.slack_authorized? && !current_user.bots_alive? %>
+          <li>
+            <%= link_to("Restart bots", bots_path(all_users: false), method: :post) %>
+          </li>
+        <% end %>
         <li>
           <%= link_to("Logout", destroy_user_session_path, method: :delete) %>
         </li>
@@ -26,9 +28,9 @@
         </li>
       <% end %>
     </ul>
-    <%- if current_user && !current_user.slack_authorized? %>
+    <% if current_user && !current_user.slack_authorized? %>
       <%= render "layouts/slack_button" %>
-    <%- end %>
+    <% end %>
 
     <%= yield %>
 

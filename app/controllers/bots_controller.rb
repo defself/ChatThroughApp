@@ -1,6 +1,9 @@
 class BotsController < ApplicationController
   def create
-    Bot.all.each do |bot|
+    all_users = params["all_users"] == "false"
+    bots      = all_users ? current_user.chat_rooms.map(&:bot)
+                          : Bot.all
+    bots.each do |bot|
       bot.kill    if     bot.alive
       bot.wake_up unless bot.alive
     end
