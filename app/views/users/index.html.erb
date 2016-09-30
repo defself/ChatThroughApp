@@ -1,20 +1,44 @@
-<% @users.each do |user| %>
-  <ul class="chat-room">
-    <li><%= "#{user.name} (#{user.user_name})" %></li>
-    <li>
-      <%= link_to_if current_user.slack_authorized?,
-        "web",
-        chat_rooms_path({ user_id: user.id, app: false }),
-        method: :post,
-        target: "_blank"
-      %>
-    </li>
-    <li>
-      <%= link_to_if current_user.slack_authorized?,
-        "app",
-        chat_rooms_path({ user_id: user.id, app: true }),
-        method: :post
-      %>
-    </li>
-  </ul>
+<% if @users.any? %>
+  <h2>Users ready for chat:</h2>
+
+  <% @users.each do |user| %>
+    <article>
+      <strong><%= "#{user.name}" %></strong>
+      -
+      <%= "@#{user.user_name}" %>
+      from
+      <i><%= "#{user.oauth.team_name}" %></i>
+
+      <% if current_user.slack_authorized? %>
+        <detail>
+          [
+          <%= link_to "web",
+            chat_rooms_path({ user_id: user.id, app: false }),
+            method: :post,
+            target: "_blank"
+          %>
+          |
+          <%= link_to "app",
+            chat_rooms_path({ user_id: user.id, app: true }),
+            method: :post
+          %>
+          ]
+        </detail>
+      <% end %>
+    </article>
+    <hr>
+  <% end %>
+
+  <% if current_user && current_user.slack_authorized? && !current_user.bots_alive? %>
+  [
+  <%= link_to("Restart your bots", bots_path(all_users: false), method: :post) %>
+  ]
+  <% end %>
+
+<% else %>
+  <h2>
+    Please,
+    <%= link_to("login", new_user_session_path) %>
+    first!
+  </h2>
 <% end %>

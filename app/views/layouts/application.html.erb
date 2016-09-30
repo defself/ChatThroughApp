@@ -4,35 +4,19 @@
     <title>ChatThroughApp</title>
     <%= csrf_meta_tags %>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbolinks-track": "reload" %>
   </head>
 
   <body>
-    <ul>
-      <% if user_signed_in? %>
-        <% if current_user.slack_authorized? && !current_user.bots_alive? %>
-          <li>
-            <%= link_to("Restart bots", bots_path(all_users: false), method: :post) %>
-          </li>
-        <% end %>
-        <li>
-          <%= link_to("Logout", destroy_user_session_path, method: :delete) %>
-        </li>
-        <li>
-          <%= "Hi @#{current_user.user_name}!" %>
-        </li>
-      <% else %>
-        <li>
-        <%= link_to("Login", new_user_session_path) %>
-        </li>
-      <% end %>
-    </ul>
+    <%= render "layouts/header" %>
+
     <% if current_user && !current_user.slack_authorized? %>
       <%= render "layouts/slack_button" %>
     <% end %>
 
-    <%= yield %>
+    <main><%= yield %></main>
 
+    <%= render "layouts/footer" %>
   </body>
 </html>

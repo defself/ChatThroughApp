@@ -1,0 +1,11 @@
+<header>
+  <nav>
+    <% if user_signed_in? %>
+      <%= link_to("Logout", destroy_user_session_path, method: :delete, style: "display: block; text-align: right;") %>
+
+      <h1><%= "Hi @#{current_user.user_name}!" %></h1>
+    <% else %>
+      <%= link_to("Login", new_user_session_path, style: "display: block; text-align: right;") %>
+    <% end %>
+  </nav>
+</header>

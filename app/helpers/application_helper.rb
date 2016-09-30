@@ -5,7 +5,7 @@ module ApplicationHelper
     )
 
     params = {
-      scope:        "bot,channels:write,chat:write:user",
+      scope:        "bot,channels:write,chat:write:bot",
       client_id:    ENV["CLIENT_ID"],
       redirect_uri: ENV["REDIRECT_URI"],
       state:        "authorized"
